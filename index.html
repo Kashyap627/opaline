@@ -292,6 +292,14 @@ input[type=range]::-moz-range-thumb{width:12px;height:12px;border:0;border-radiu
 .f-go svg{width:16px;height:16px;display:block}
 .frow.busy .f-go{display:none}
 .frow.busy .spin{display:block;color:#fff}
+/* quality dropdown inside the video row */
+.vq{display:block;margin-top:5px;align-self:flex-start;max-width:100%;background:rgba(255,255,255,.07);
+  color:var(--ink);border:1px solid rgba(255,255,255,.14);border-radius:8px;padding:3px 8px;
+  font:600 11px 'Instrument Sans';cursor:pointer;transition:.2s}
+.vq:hover{border-color:rgba(255,255,255,.28)}
+.vq:focus{outline:none;border-color:var(--accent)}
+.vq:disabled{opacity:.5;cursor:default}
+.vq option{background:#241b2e;color:var(--ink)}
 /* marquee */
 .mq{overflow:hidden;white-space:nowrap;mask-image:linear-gradient(to right,transparent,#000 6%,#000 94%,transparent)}
 .mq-track{display:inline-block}
@@ -332,6 +340,42 @@ body.immersive{cursor:default}
   font:600 12.5px 'Instrument Sans';cursor:pointer;transition:.2s}
 .seg button:hover{color:var(--ink)}
 .seg button.on{background:#fff;color:#0b0b0e}
+/* keyboard shortcuts cheat sheet */
+#keyModal{position:fixed;inset:0;z-index:60;display:grid;place-items:center;padding:20px;
+  background:rgba(8,8,11,.5);-webkit-backdrop-filter:blur(18px);backdrop-filter:blur(18px);
+  opacity:0;visibility:hidden;transition:.35s}
+#keyModal.open{opacity:1;visibility:visible}
+#keyModal.open .sheet{transform:none}
+.krow{display:flex;align-items:center;justify-content:space-between;gap:14px;padding:9px 2px;
+  border-bottom:1px solid rgba(255,255,255,.06);font-size:13px;color:var(--ink-2)}
+.krow:last-of-type{border-bottom:0}
+.krow kbd{font:600 11px var(--mono);background:rgba(255,255,255,.09);border:1px solid rgba(255,255,255,.14);
+  border-radius:6px;padding:3px 8px;color:var(--ink);min-width:26px;text-align:center;display:inline-block}
+/* queue / up next card */
+.qhead{display:flex;align-items:flex-start;gap:10px;margin-bottom:10px}
+.qhead .qicon{width:17px;height:17px;color:var(--accent);flex:none;margin-top:3px}
+.qmeta{flex:1;min-width:0}
+.qmeta b{display:block;font:600 13px 'Instrument Sans';color:var(--ink);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.qmeta span{font:600 10px 'Instrument Sans';letter-spacing:.18em;color:var(--ink-3);text-transform:uppercase}
+.qlist{max-height:300px;overflow:auto;display:flex;flex-direction:column;gap:2px;margin-top:2px}
+.qlist::-webkit-scrollbar{width:7px}
+.qlist::-webkit-scrollbar-thumb{background:rgba(255,255,255,.12);border-radius:99px}
+.qrow{display:grid;grid-template-columns:18px 46px minmax(0,1fr) auto 16px;gap:9px;align-items:center;
+  width:100%;padding:6px 7px;border-radius:11px;cursor:pointer;transition:.15s;
+  background:none;border:0;color:inherit;font:inherit;text-align:left}
+.qrow:hover{background:rgba(255,255,255,.06)}
+.qrow.on{background:rgba(255,255,255,.09);box-shadow:inset 0 0 0 1px rgba(255,255,255,.08)}
+.qrow .qi{font:600 11px var(--mono);color:var(--ink-3);text-align:center}
+.qrow.on .qi{color:var(--accent)}
+.qrow img{width:46px;height:26px;object-fit:cover;border-radius:6px;background:rgba(255,255,255,.06)}
+.qrow .qt{min-width:0}
+.qrow .qt b{display:block;font:600 12.5px 'Instrument Sans';color:var(--ink);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.qrow .qt span{display:block;font:500 11px 'Instrument Sans';color:var(--ink-3);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.qrow .qd{font:600 11px var(--mono);color:var(--ink-3)}
+.qrow .qx{opacity:0;background:none;border:0;color:var(--ink-3);cursor:pointer;padding:2px;display:grid;place-items:center;transition:.15s}
+.qrow:hover .qx{opacity:.85}
+.qrow .qx:hover{color:#ff7a6b;opacity:1}
+.qrow .qx svg{width:12px;height:12px}
 @media (prefers-reduced-motion:reduce){
   #coverdrift.on{animation:none}
   .mq.anim .mq-track{animation:none}
@@ -416,6 +460,9 @@ body.immersive{cursor:default}
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
           <input id="histSearch" type="text" placeholder="Search your listens…" spellcheck="false">
         </div>
+        <button class="icon-btn" id="histPlayAll" title="Play all — queue your whole history">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 6h9"/><path d="M4 12h9"/><path d="M4 18h9"/><path d="m16 8 5 4-5 4V8Z"/></svg>
+        </button>
         <button class="icon-btn" id="histShuffle" title="Surprise me — play a random one">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 3h5v5"/><path d="M8 3H3v5"/><path d="M21 3l-7.5 7.5"/><path d="M3 3l7.5 7.5"/><path d="M16 21h5v-5"/><path d="M14.5 14.5 21 21"/><path d="M3 21l7.5-7.5"/><path d="M8 21H3v-5"/></svg>
         </button>
@@ -545,10 +592,27 @@ body.immersive{cursor:default}
           <span class="f-go"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 15V3"/><path d="M7 10l5 5 5-5"/><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/></svg></span>
           <span class="spin"></span>
         </button>
+        <div class="frow" id="rowVideo" role="button" tabindex="0" title="Download video (MP4)">
+          <span class="f-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m22 8-6 4 6 4V8Z"/><rect width="14" height="12" x="2" y="6" rx="2" ry="2"/></svg></span>
+          <span class="f-t"><b>Video (MP4)</b><span id="videoSub">MP4 · resolved on demand</span><select id="videoQ" class="vq hide" title="Video quality" aria-label="Video quality"></select></span>
+          <span class="f-go"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 15V3"/><path d="M7 10l5 5 5-5"/><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/></svg></span>
+          <span class="spin"></span>
+        </div>
+      </div>
+
+      <div class="card glass hide" id="qCard">
+        <div class="qhead">
+          <svg class="qicon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h13"/><path d="M3 12h13"/><path d="M3 18h9"/><path d="M19 12v6"/><path d="m16 15 3 3 3-3"/></svg>
+          <div class="qmeta"><b id="qTitle">Queue</b><span id="qInfo">—</span></div>
+          <button class="icon-btn sm" id="qClear" title="Clear queue">
+            <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>
+          </button>
+        </div>
+        <div class="qlist" id="qList"></div>
       </div>
     </aside>
   </div>
-  <div class="foot">Opaline runs entirely on your device · <kbd>F</kbd> immersive · <kbd>Esc</kbd> back · nothing is uploaded, nothing is tracked</div>
+  <div class="foot">Opaline runs entirely on your device · <kbd>F</kbd> immersive · <kbd>Esc</kbd> back · <kbd>?</kbd> shortcuts · nothing is uploaded, nothing is tracked</div>
 </section>
 
 <div id="toasts"></div>
@@ -577,6 +641,29 @@ body.immersive{cursor:default}
     </div>
     <p class="fine">Audio-only plays the resolved MP3 natively — lighter, pure music. If the link expires
       mid-listen, Opaline falls back to YouTube at the same position. Switching reloads the track.</p>
+  </div>
+</div>
+
+<!-- keyboard shortcuts -->
+<div id="keyModal" aria-hidden="true">
+  <div class="sheet glass glass-strong">
+    <div class="sh-head">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="20" height="16" x="2" y="4" rx="2"/><path d="M6 8h.01"/><path d="M10 8h.01"/><path d="M14 8h.01"/><path d="M18 8h.01"/><path d="M8 12h.01"/><path d="M12 12h.01"/><path d="M16 12h.01"/><path d="M7 16h10"/></svg>
+      <h2>Keyboard shortcuts</h2>
+      <button class="icon-btn sm" id="keyClose">
+        <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>
+      </button>
+    </div>
+    <div class="krow"><span>Play / pause</span><kbd>Space</kbd></div>
+    <div class="krow"><span>Seek back / forward 5s</span><span><kbd>←</kbd> <kbd>→</kbd></span></div>
+    <div class="krow"><span>Volume up / down</span><span><kbd>↑</kbd> <kbd>↓</kbd></span></div>
+    <div class="krow"><span>Mute</span><kbd>M</kbd></div>
+    <div class="krow"><span>Immersive mode</span><kbd>F</kbd></div>
+    <div class="krow"><span>Focus search</span><kbd>/</kbd></div>
+    <div class="krow"><span>This cheat sheet</span><kbd>?</kbd></div>
+    <div class="krow"><span>Close overlay / back</span><kbd>Esc</kbd></div>
+    <p class="fine">Media keys and lock-screen controls work too — Opaline registers with your OS through
+      the Media Session API. With a playlist queued, the previous / next buttons skip tracks.</p>
   </div>
 </div>
 
@@ -790,14 +877,23 @@ function runSubmit(raw, inline){
   if(!url){ const m='That doesn’t look like a YouTube link yet — try watch, youtu.be or shorts.';
     inline?heroFail(m):toast(m,'info'); return; }
   const ex=extractFromUrl(url);
-  if(ex.err==='playlist'){ const m='That’s a playlist — paste an individual video (watch?v=…).';
-    inline?heroFail(m):toast(m,'info'); return; }
+  const lp=url.searchParams.get('list');
+  const listId=(lp && /^[A-Za-z0-9_-]{12,}$/.test(lp)) ? lp : null;
+  if(ex.err==='playlist'){
+    if(!listId){ const m='That playlist link looks malformed — check the list= parameter.';
+      inline?heroFail(m):toast(m,'info'); return; }
+    $('#heroErr').classList.remove('on');
+    if(!inline){ $('#miniInput').value=''; $('#miniInput').blur(); }
+    loadPlaylist(listId, null);
+    return;
+  }
   if(!ex.id || !/^[A-Za-z0-9_-]{11}$/.test(ex.id)){
     const m='I couldn’t find a valid 11-character video ID in that link.';
     inline?heroFail(m):toast(m,'info'); return; }
   $('#heroErr').classList.remove('on');
   if(!inline){ $('#miniInput').value=''; $('#miniInput').blur(); }
   startTrack(ex.id, ex.start||0);
+  if(listId) loadPlaylist(listId, ex.id);   /* watch?v=…&list=… — start video, queue the rest */
 }
  $('#heroForm').addEventListener('submit',e=>{ e.preventDefault(); runSubmit($('#heroInput').value,true); });
  $('#miniForm').addEventListener('submit',e=>{ e.preventDefault(); runSubmit($('#miniInput').value,false); });
@@ -818,16 +914,16 @@ function setPlayUI(p){
 }
 function hideVeil(){ $('#veil').classList.remove('on'); }
 function useYTEngine(id,start){
-  engMode='yt'; $('#nowSrc').textContent='YOUTUBE VIDEO';
+  engMode='yt'; $('#nowSrc').textContent=srcLabel('YOUTUBE VIDEO');
   if(A){ try{ A.pause(); A.removeAttribute('src'); A.load(); }catch(e){} }
   mountPlayer(id,start);
 }
 function useAudioEngine(url,start=0){
-  engMode='audio'; $('#nowSrc').textContent='AUDIO-ONLY STREAM';
+  engMode='audio'; $('#nowSrc').textContent=srcLabel('AUDIO-ONLY STREAM');
   if(player && player.pauseVideo){ try{ player.pauseVideo(); }catch(e){} }
   hideVeil();
   if(!A){
-    A=new Audio(); A.preload='auto';
+    A=new Audio(); A.preload='auto'; window.__A=A; /* automation/test hook */
     A.addEventListener('loadedmetadata',()=>{
       duration=A.duration; $('#rem').textContent='-'+fmt(duration);
       if(pendingSeek){ try{ A.currentTime=pendingSeek; }catch(e){} pendingSeek=0; }
@@ -835,7 +931,7 @@ function useAudioEngine(url,start=0){
     });
     A.addEventListener('play', ()=>setPlayUI(true));
     A.addEventListener('pause',()=>setPlayUI(false));
-    A.addEventListener('ended', ()=>{ setPlayUI(false); try{ A.currentTime=0; }catch(e){} paintScrub(0); });
+    A.addEventListener('ended', onTrackEnd);
     A.addEventListener('error', ()=>{
       if(engMode!=='audio'||!state.id) return;
       const at=A.currentTime||0;
@@ -870,7 +966,7 @@ function createPlayer(id,start){
       onStateChange: e=>{
         if(e.data===1){ setPlayUI(true); hideVeil(); }
         else if(e.data===2){ setPlayUI(false); }
-        else if(e.data===0){ setPlayUI(false); player.seekTo(0,true); player.pauseVideo(); }
+        else if(e.data===0){ onTrackEnd(); }
       },
       onError: onErr
     }
@@ -920,6 +1016,7 @@ function setTrackUI(title,author){
       mq.classList.add('anim');
     }
   });
+  msUpdateMeta();
 }
 function setArt(id){
   const img=$('#artImg'), q=['maxresdefault','sddefault','hqdefault']; let i=0;
@@ -937,25 +1034,30 @@ async function startTrack(id, start=0){
   hideVeil(); setPlayUI(false);
   if(audioState.id !== id){ audioState.id=null; audioState.url=null; audioState.size=0; }
   setAudioSub('MP3 · resolved on demand');
+  $('#videoQ').classList.add('hide'); $('#videoQ').innerHTML=''; setVideoSub('MP4 · resolved on demand');
   setArt(id);
   goPlayer();
+  let rs=start||0, resumed=false;
+  if(!rs){ const p=posMap[id]; if(p&&p.t>=20){ rs=p.t; resumed=true; } } /* resume where you left off */
+  posLast=0; /* let the ticker save the new position right away */
   const metaPromise=fetchMeta(id);
   extractPalette(id).then(pal=>{ applyPalette(pal, id); });
 
   if(settings.playback==='audio'){
     try{
       const r=await resolveAudio(id);
-      useAudioEngine(r.url, start);
+      useAudioEngine(r.url, rs);
     }catch(err){
       if (err && err.message === 'cancelled') return; /* a newer track took over */
       toast('Audio stream unavailable — playing the YouTube video instead','warn');
-      engMode='yt'; mountPlayer(id,start);
+      engMode='yt'; mountPlayer(id,rs);
     }
   }else{
-    engMode='yt'; $('#nowSrc').textContent='YOUTUBE VIDEO';
+    engMode='yt'; $('#nowSrc').textContent=srcLabel('YOUTUBE VIDEO');
     if(A){ try{ A.pause(); A.removeAttribute('src'); }catch(e){} }
-    mountPlayer(id,start);
+    mountPlayer(id,rs);
   }
+  if(resumed) toast('Resumed at '+fmt(rs),'info');
 
   const meta=await metaPromise;
   pushHistory({ id, title:meta.title, author:meta.author, ts:Date.now() });
@@ -1026,6 +1128,180 @@ function renderHistoryPage(){
   const h=loadHist(); if(!h.length) return toast('History is empty','info');
   instantTrack(h[Math.floor(Math.random()*h.length)].id);
 });
+
+/* ---------------- resume where you left off ---------------- */
+const POSKEY='opaline.pos';
+const posMap=(()=>{ try{ return JSON.parse(localStorage.getItem(POSKEY))||{}; }catch(e){ return {}; } })();
+let posLast=0;
+function savePosMap(){ try{ localStorage.setItem(POSKEY,JSON.stringify(posMap)); }catch(e){} }
+function posSave(force){
+  if(!hasTrack||!state.id) return;
+  const t=engineTime(); if(!t||t<5) return;
+  const now=Date.now();
+  if(!force && now-posLast<5000) return;
+  posLast=now;
+  if(duration && t>duration-15){ if(posMap[state.id]){ delete posMap[state.id]; savePosMap(); } return; }
+  posMap[state.id]={t:Math.floor(t),ts:now};
+  const ks=Object.keys(posMap);
+  if(ks.length>100) ks.sort((a,b)=>(posMap[a].ts||0)-(posMap[b].ts||0)).slice(0,ks.length-100).forEach(k=>delete posMap[k]);
+  savePosMap();
+}
+addEventListener('pagehide',()=>posSave(true));
+
+/* ---------------- media session — OS media keys / lock screen ---------------- */
+function msSupported(){ return 'mediaSession' in navigator && typeof MediaMetadata!=='undefined'; }
+function msUpdateMeta(){
+  if(!msSupported()||!state.id) return;
+  try{
+    navigator.mediaSession.metadata=new MediaMetadata({
+      title:state.title||'Opaline',
+      artist:state.author||'YouTube',
+      album:'Opaline',
+      artwork:[
+        {src:'https://i.ytimg.com/vi/'+state.id+'/mqdefault.jpg',sizes:'320x180',type:'image/jpeg'},
+        {src:'https://i.ytimg.com/vi/'+state.id+'/hqdefault.jpg',sizes:'480x360',type:'image/jpeg'},
+        {src:'https://i.ytimg.com/vi/'+state.id+'/maxresdefault.jpg',sizes:'1280x720',type:'image/jpeg'}
+      ]
+    });
+    msBindActions();
+  }catch(e){}
+}
+function msBindActions(){
+  if(!msSupported()) return;
+  const set=(a,h)=>{ try{ navigator.mediaSession.setActionHandler(a,h); }catch(e){} };
+  set('play',        ()=>{ if(hasTrack) togglePlay(); });
+  set('pause',       ()=>{ if(hasTrack) togglePlay(); });
+  set('seekbackward',()=>seekBy(-10));
+  set('seekforward', ()=>seekBy(10));
+  set('seekto', d=>{ if(hasTrack&&d&&d.seekTime!=null) engineSeek(d.seekTime); });
+  if(queueActive()){ set('previoustrack',()=>queueJump(-1)); set('nexttrack',()=>queueJump(1)); }
+  else{ set('previoustrack',null); set('nexttrack',null); }
+}
+function msPos(){
+  if(!msSupported()||!hasTrack||!duration) return;
+  const t=engineTime(); if(t==null||isNaN(t)) return;
+  const rate=engMode==='audio'?(A?A.playbackRate:1):((player&&player.getPlaybackRate)?player.getPlaybackRate():1);
+  try{ navigator.mediaSession.setPositionState({ duration:duration, position:Math.min(Math.max(t,0),duration), playbackRate:rate||1 }); }catch(e){}
+}
+
+/* ============================================================
+   PLAYLISTS — queue engine via ytplaylistlength.one + UP NEXT card
+   ============================================================ */
+const PL_API='https://ytplaylistlength.one/api/calculate';
+const plCache=new Map(); let plSeq=0;
+async function fetchPlaylist(listId){
+  const c=plCache.get(listId);
+  if(c && Date.now()-c.ts<600000) return c.data;
+  const fd=new FormData();
+  fd.append('search_string','https://www.youtube.com/playlist?list='+listId);
+  fd.append('range_start','1'); fd.append('range_end','300');
+  fd.append('custom_speed',''); fd.append('youtube_api','');
+  const ac=new AbortController(); const kill=setTimeout(()=>ac.abort(),30000);
+  try{
+    const r=await fetch(PL_API,{method:'POST',body:fd,signal:ac.signal});
+    if(!r.ok) throw new Error('HTTP '+r.status);
+    const j=await r.json();
+    const res=j&&Array.isArray(j.results)?j.results[0]:null;
+    if(!res||!Array.isArray(res.videos)||!res.videos.length) throw new Error('no tracks');
+    const data={ id:listId, title:res.title||'Playlist', creator:res.creator||'',
+      total:res.videoCount||res.videos.length,
+      videos:res.videos.filter(v=>v&&v.id&&/^[A-Za-z0-9_-]{11}$/.test(v.id))
+        .map(v=>({ id:v.id, title:v.title||'Untitled', channel:v.channel||'', sec:+v.durationSeconds||0 })) };
+    if(!data.videos.length) throw new Error('no playable tracks');
+    plCache.set(listId,{data,ts:Date.now()});
+    return data;
+  }finally{ clearTimeout(kill); }
+}
+const queue={ items:[], idx:-1, meta:null };
+function queueActive(){ return queue.items.length>1; }
+function srcLabel(fallback){
+  return queueActive() ? ((queue.meta?'PLAYLIST':'QUEUE')+' · '+(queue.idx+1)+'/'+queue.items.length) : fallback;
+}
+function resetSrcLabel(){ $('#nowSrc').textContent = engMode==='audio' ? 'AUDIO-ONLY STREAM' : 'YOUTUBE VIDEO'; }
+function queueSet(items, idx, meta){
+  queue.items=items||[];
+  queue.idx=queue.items.length?Math.max(0,Math.min(idx|0,queue.items.length-1)):-1;
+  queue.meta=meta||null;
+  paintQueue(); msBindActions();
+}
+function paintQueue(){
+  const card=$('#qCard');
+  if(!queue.items.length){ card.classList.add('hide'); $('#qList').innerHTML=''; return; }
+  card.classList.remove('hide');
+  $('#qTitle').textContent=queue.meta?queue.meta.title:'Queue';
+  const tot=queue.items.reduce((a,b)=>a+(b.sec||0),0);
+  $('#qInfo').textContent=(queue.meta&&queue.meta.creator?queue.meta.creator+' · ':'')
+    +queue.items.length+' tracks · '+fmt(tot)
+    +(queue.meta&&queue.meta.total>queue.items.length?' · of '+queue.meta.total:'');
+  $('#qList').innerHTML=queue.items.map((it,i)=>`
+    <button class="qrow${i===queue.idx?' on':''}" data-i="${i}" title="${esc(it.title)}">
+      <span class="qi">${i===queue.idx?'▶':(i+1)}</span>
+      <img src="${thumbFor(it.id)}" alt="" draggable="false" loading="lazy">
+      <span class="qt"><b>${esc(it.title)}</b><span>${esc(it.channel||'')}</span></span>
+      <span class="qd">${it.sec?fmt(it.sec):'—'}</span>
+      <span class="qx" data-x="${i}" title="Remove from queue" role="button">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>
+      </span>
+    </button>`).join('');
+  $('#qList').querySelectorAll('.qrow').forEach(r=>{
+    r.addEventListener('click',e=>{
+      if(e.target.closest('.qx')) return;
+      queuePlay(+r.dataset.i);
+    });
+  });
+  $('#qList').querySelectorAll('.qx').forEach(x=>{
+    x.addEventListener('click',e=>{
+      e.stopPropagation();
+      const i=+x.dataset.x; if(i<0||i>=queue.items.length) return;
+      queue.items.splice(i,1);
+      if(i<queue.idx) queue.idx--;
+      else if(i===queue.idx) queue.idx=-1;
+      if(!queue.items.length){ queueSet([],-1,null); resetSrcLabel(); }
+      else{ paintQueue(); msBindActions(); }
+    });
+  });
+  const cur=$('#qList').querySelector('.qrow.on');
+  if(cur) cur.scrollIntoView({block:'nearest'});
+}
+function queuePlay(i){
+  const it=queue.items[i]; if(!it) return;
+  queue.idx=i; paintQueue();
+  $('#nowT').textContent=it.title; $('#nowA').textContent=it.channel||'YouTube';
+  $('#nowSrc').textContent=srcLabel('YOUTUBE VIDEO');
+  startTrack(it.id,0);
+}
+function queueJump(d){ const n=queue.idx+d; if(n>=0&&n<queue.items.length) queuePlay(n); }
+function onTrackEnd(){
+  if(state.id&&posMap[state.id]){ delete posMap[state.id]; savePosMap(); } /* finished — forget position */
+  if(queue.idx>=0&&queue.idx<queue.items.length-1){ queuePlay(queue.idx+1); return; }
+  setPlayUI(false); paintScrub(0);
+  $('#cur').textContent='0:00'; $('#rem').textContent='–:––';
+  if(queueActive()&&queue.idx===queue.items.length-1) toast('Playlist finished','info');
+}
+async function loadPlaylist(listId, focusId){
+  const seq=++plSeq;
+  toast('Loading playlist…','info');
+  try{
+    const data=await fetchPlaylist(listId);
+    if(seq!==plSeq) return;                     /* a newer load took over */
+    let idx=focusId?data.videos.findIndex(v=>v.id===focusId):0;
+    if(idx<0) idx=0;
+    queueSet(data.videos, idx, { title:data.title, creator:data.creator, total:data.total });
+    toast('Queued '+data.videos.length+' tracks — '+data.title);
+    if(!focusId||state.id!==data.videos[idx].id) queuePlay(idx);   /* already playing that one? just show the queue */
+  }catch(err){
+    if(seq===plSeq) toast('Playlist load failed — playing just this video','warn');
+  }
+}
+$('#qClear').addEventListener('click',()=>{ queueSet([],-1,null); resetSrcLabel(); toast('Queue cleared','info'); });
+$('#histPlayAll').addEventListener('click',()=>{
+  const h=loadHist(); if(!h.length) return toast('History is empty','info');
+  queueSet(h.map(x=>({ id:x.id, title:x.title||'Untitled', channel:x.author||'', sec:0 })), 0, null);
+  toast('Queued '+h.length+' listens');
+  queuePlay(0);
+});
+/* media-key position sync + resume save ticker */
+setInterval(()=>{ if(!hasTrack) return; msPos(); posSave(); }, 1000);
 
 /* ---------------- transport ---------------- */
 function engineTime(){
@@ -1194,78 +1470,93 @@ async function verifyStream(url) {
   } catch (_) { return { ok: true, size: 0, assumed: true }; }
 }
 const audioState = { id:null, url:null, size:0, busy:false };
+const videoState = { busy:false };
+const formatCache = { id:null, data:null, ts:0 };
+const setVideoSub = t => { $('#videoSub').textContent = t; };
+
+/* ONE details call serves everything: audio streaming, the MP3 download row
+   and the video quality dropdown. cdn_url job links stay valid, so cache
+   per video for 10 min and reuse across all three consumers. */
+async function fetchFormats(videoId) {
+  if (formatCache.id === videoId && formatCache.data && Date.now() - formatCache.ts < 600000)
+    return formatCache.data;
+  const res = await fetch('https://api.youtubetomp.com/api/downloader/youtube/details', {
+    method: 'POST',
+    headers: { 'content-type': 'application/json' },
+    body: JSON.stringify({ url: 'https://www.youtube.com/watch?v=' + videoId }),
+    cache: 'no-cache'
+  });
+  if (!res.ok) throw new Error('API returned status ' + res.status);
+  const j = await res.json();
+  if (!j.success || !j.data) throw new Error('Invalid API response');
+  formatCache.id = videoId; formatCache.data = j.data; formatCache.ts = Date.now();
+  return j.data;
+}
+
+/* Shared queue-poller. The CDN endpoint answers status:"queued"/"processing"
+   with percent for a while before fileUrl appears (evidence: {"status":"queued",
+   "percent":"0%","totalWaiting":1}). Retry often — every 1.5s, up to the given
+   budget — instead of failing instantly; onPoll surfaces live feedback.
+   Used by both the MP3 path and every MP4 quality. */
+const POLL_MS = 1500;
+async function pollCdn(videoId, cdnUrl, { budget = 120000, onPoll = () => {} } = {}) {
+  const sleep = ms => new Promise(r => setTimeout(r, ms));
+  const STUCK = ['error', 'failed'];
+  const t0 = Date.now();
+  let metadata = null, netFails = 0, attempt = 0;
+  while (!metadata) {
+    attempt++;
+    if (Date.now() - t0 > budget)
+      throw new Error('Still converting on the server — the job stays queued, click again in a bit');
+    if (state.id && state.id !== videoId) throw new Error('cancelled'); // user moved on
+    try {
+      const metaRes = await fetch(cdnUrl, {
+        method: 'GET',
+        headers: { 'Accept': 'application/json' },
+        cache: 'no-cache'
+      });
+      if (!metaRes.ok) throw new Error('CDN metadata fetch failed: ' + metaRes.status);
+      const m = await metaRes.json();
+      const st = String(m.status || '').toLowerCase();
+      if (STUCK.includes(st))
+        throw new Error('Server-side conversion failed (' + st + ')');
+      if (st === 'completed' && m.fileUrl) { metadata = m; break; }
+      netFails = 0;
+      const pct = Math.round(parseFloat(m.percent) || parseFloat(m.progress) || 0);
+      const qpos = m.position ? ' · #' + m.position
+                : (m.totalWaiting ? ' · ' + m.totalWaiting + ' in queue' : '');
+      onPoll({ kind: 'progress', st: st || 'processing', pct, qpos, attempt });
+    } catch (pollErr) {
+      if (/conversion failed/.test(pollErr.message)) throw pollErr;
+      netFails++;
+      if (netFails > 6)
+        throw new Error('Could not fetch metadata: ' + (pollErr.message || 'network error'));
+      onPoll({ kind: 'retry', n: netFails, msg: pollErr.message });
+    }
+    await sleep(POLL_MS);
+  }
+  return metadata;
+}
 
 async function resolveAudio(videoId) {
-  let url = null, size = 0;
   try {
     setStatus('Fetching YoutubetoMP…', 15);
-    const res = await fetch('https://api.youtubetomp.com/api/downloader/youtube/details', {
-      method: 'POST',
-      headers: { 'content-type': 'application/json' },
-      body: JSON.stringify({ url: 'https://www.youtube.com/watch?v=' + videoId }),
-      cache: 'no-cache'
-    });
-    if (!res.ok) throw new Error('API returned status ' + res.status);
-    
-    const j = await res.json();
-    if (!j.success || !j.data) throw new Error('Invalid API response');
-    
-    const audioFormat = j.data.formats.find(f => f.audio_only);
+    const data = await fetchFormats(videoId);
+    const audioFormat = (data.formats || []).find(f => f.audio_only);
     if (!audioFormat || !audioFormat.cdn_url) throw new Error('No audio format available');
-    
-    const cdnUrl = audioFormat.cdn_url;
-    setStatus('Fetching metadata…', 40);
-    
-    /* The CDN endpoint answers status:"queued" (or converting/downloading) for a
-       while before fileUrl appears — evidence: {"status":"queued","percent":"0%",
-       "totalWaiting":1}. Retry often (every 1.5s, up to 2 min) instead of failing
-       instantly, and surface live queue/percent feedback while waiting for the url. */
-    const sleep = ms => new Promise(r => setTimeout(r, ms));
-    const POLL_MS = 1500, POLL_BUDGET = 120000, t0 = Date.now();
-    const STUCK = ['error', 'failed'];
-    let metadata = null, netFails = 0, attempt = 0;
 
-    setStatus('Fetching metadata…', 40);
-    while (!metadata) {
-      attempt++;
-      if (Date.now() - t0 > POLL_BUDGET)
-        throw new Error('Still converting on the server — try again in a moment');
-      if (state.id && state.id !== videoId) throw new Error('cancelled');
-      try {
-        const metaRes = await fetch(cdnUrl, {
-          method: 'GET',
-          headers: { 'Accept': 'application/json' },
-          cache: 'no-cache'
-        });
-        if (!metaRes.ok) throw new Error('CDN metadata fetch failed: ' + metaRes.status);
-        const m = await metaRes.json();
-        const st = String(m.status || '').toLowerCase();
-        if (STUCK.includes(st))
-          throw new Error('Server-side conversion failed (' + st + ')');
-        if (st === 'completed' && m.fileUrl) { metadata = m; break; }
-        netFails = 0;
-        const pct = Math.round(parseFloat(m.percent) || parseFloat(m.progress) || 0);
-        const qpos = m.position ? ' · #' + m.position
-                  : (m.totalWaiting ? ' · ' + m.totalWaiting + ' in queue' : '');
-        setStatus('Server ' + (st || 'processing') + qpos + ' · ' + pct + '% · poll ' + attempt,
-                  40 + Math.min(22, pct * 0.22));
-        setAudioSub('MP3 · ' + (st || 'processing') + ' ' + pct + '% — waiting for url');
-      } catch (pollErr) {
-        if (/conversion failed/.test(pollErr.message)) throw pollErr;
-        netFails++;
-        if (netFails > 6)
-          throw new Error('Could not fetch metadata: ' + (pollErr.message || 'network error'));
-        setStatus('Retrying metadata… (' + netFails + '/6)', 40);
-      }
-      await sleep(POLL_MS);
-    }
-    
+    const metadata = await pollCdn(videoId, audioFormat.cdn_url, { budget: 120000, onPoll: u => {
+      if (u.kind === 'retry') { setStatus('Retrying metadata… (' + u.n + '/6)', 40); return; }
+      setStatus('Server ' + u.st + u.qpos + ' · ' + u.pct + '% · poll ' + u.attempt,
+                40 + Math.min(22, u.pct * 0.22));
+      setAudioSub('MP3 · ' + u.st + ' ' + u.pct + '% — waiting for url');
+    }});
+
     if (!metadata.fileUrl) throw new Error('No fileUrl in CDN response');
-    
-    url = metadata.fileUrl;
-    size = metadata.fileSizeBytes || 0;
+    const url = metadata.fileUrl;
+    const size = metadata.fileSizeBytes || 0;
     setStatus('Verifying stream…', 65);
-    
+
     const v = await verifyStream(url);
     audioState.id = videoId; audioState.url = url; audioState.size = size || v.size || 0;
     setStatus(size ? 'Ready · '+fmtMB(size) : 'Ready', 100);
@@ -1279,15 +1570,15 @@ async function resolveAudio(videoId) {
   }
 }
 
-async function downloadAudio(currentDownloadUrl, currentTitle, { openFallback = true } = {}) {
+async function downloadAudio(currentDownloadUrl, currentTitle, { openFallback = true, size = 0, ext = 'mp3', sub = setAudioSub } = {}) {
   try {
     const res = await fetch(currentDownloadUrl, {
       method: 'GET',
-      headers: { 'Accept': 'audio/mpeg, audio/*, application/octet-stream, */*' },
+      headers: { 'Accept': 'audio/mpeg, audio/*, video/mp4, application/octet-stream, */*' },
       cache: 'no-cache'
     });
     if (!res.ok) throw new Error('status ' + res.status);
-    const total = +(res.headers.get('content-length') || 0) || audioState.size || 0;
+    const total = +(res.headers.get('content-length') || 0) || size || audioState.size || 0;
     let blob;
     if (res.body && res.body.getReader) {
       const reader = res.body.getReader();
@@ -1298,9 +1589,9 @@ async function downloadAudio(currentDownloadUrl, currentTitle, { openFallback = 
         chunks.push(value); got += value.length;
         const label = total ? Math.round(got/total*100)+'%' : fmtMB(got);
         setStatus('Saving · '+label, total ? Math.round(got/total*100) : 50);
-        setAudioSub('Saving · '+label);
+        sub('Saving · '+label);
       }
-      blob = new Blob(chunks, { type: res.headers.get('content-type') || 'audio/mpeg' });
+      blob = new Blob(chunks, { type: res.headers.get('content-type') || (ext === 'mp4' ? 'video/mp4' : 'audio/mpeg') });
     } else {
       blob = await res.blob();
     }
@@ -1308,19 +1599,19 @@ async function downloadAudio(currentDownloadUrl, currentTitle, { openFallback = 
     const a = document.createElement('a');
     const safeName = (currentTitle || state.title || 'youtube-audio')
       .replace(/[\\/:*?"<>|]/g, '').substring(0, 80);
-    a.href = blobUrl; a.download = safeName + '.mp3';
+    a.href = blobUrl; a.download = safeName + '.' + ext;
     document.body.appendChild(a); a.click(); a.remove();
     setTimeout(() => URL.revokeObjectURL(blobUrl), 8000);
-    toast('Download started — ' + safeName.slice(0, 32) + '.mp3', 'download');
-    setAudioSub('MP3 · ' + fmtMB(blob.size) + ' · saved');
+    toast('Download started — ' + safeName.slice(0, 32) + '.' + ext, 'download');
+    sub(ext.toUpperCase() + ' · ' + fmtMB(blob.size) + ' · saved');
     clearStatus();
     return 'saved';
   } catch (_) { /* fall through to open-in-tab fallback */ }
   clearStatus();
   if (openFallback) {
     window.open(currentDownloadUrl, '_blank');
-    toast('Opened in new tab — right-click the player and select "Save audio as"', 'warn');
-    setAudioSub('MP3 · opened in new tab');
+    toast('Opened in new tab — right-click the player and select "Save ' + (ext === 'mp4' ? 'video' : 'audio') + ' as"', 'warn');
+    sub(ext.toUpperCase() + ' · opened in new tab');
     return 'opened';
   }
   return 'failed';
@@ -1347,6 +1638,69 @@ async function downloadAudio(currentDownloadUrl, currentTitle, { openFallback = 
   } finally {
     audioState.busy = false;
     busy($('#rowAudio'), false);
+  }
+});
+
+/* ---------------- video (MP4) download · quality dropdown ---------------- */
+const videoFmts = data => (data.formats || []).filter(f => !f.audio_only && f.cdn_url)
+                          .sort((a, b) => (b.height || 0) - (a.height || 0));
+function escHtml(s){ return String(s).replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c])); }
+function fillVideoQ(data) {
+  const sel = $('#videoQ'), list = videoFmts(data);
+  const prev = sessionStorage.getItem('opaline.vq') || '';
+  sel.innerHTML = list.map(f =>
+    `<option value="${escHtml(f.quality)}"${f.quality === prev ? ' selected' : ''}>${escHtml((f.label || f.quality).replace(/^MP4\s+/i, ''))}</option>`).join('');
+  sel.classList.toggle('hide', !list.length);
+  if (list.length && !list.some(f => f.quality === prev))
+    sessionStorage.setItem('opaline.vq', list[0].quality); // remember first pick next time
+  return list;
+}
+function currentVideoFmt(data) {
+  const sel = $('#videoQ'), list = videoFmts(data);
+  return list.find(f => f.quality === sel.value) || list[0] || null;
+}
+$('#videoQ').addEventListener('click', e => e.stopPropagation()); // picking a quality ≠ download click
+$('#videoQ').addEventListener('change', () => sessionStorage.setItem('opaline.vq', $('#videoQ').value));
+
+$('#rowVideo').addEventListener('click', async e => {
+  if (e.target.closest('select')) return;
+  if (!state.id) return toast('Load a track first', 'info');
+  if (videoState.busy) return;
+  videoState.busy = true;
+  busy($('#rowVideo'), true);
+  $('#videoQ').disabled = true;
+  let fmt = null;
+  try {
+    const data = await fetchFormats(state.id);
+    fillVideoQ(data);
+    fmt = currentVideoFmt(data);
+    if (!fmt) throw new Error('No video format available');
+    setVideoSub(fmt.quality + ' · resolving…');
+    setStatus('Resolving MP4 ' + fmt.quality + '…', 20);
+    const m = await pollCdn(state.id, fmt.cdn_url, { budget: 240000, onPoll: u => {
+      if (u.kind === 'retry') {
+        setStatus('Retrying metadata… (' + u.n + '/6)', 40);
+        setVideoSub(fmt.quality + ' · retrying (' + u.n + '/6)');
+        return;
+      }
+      setStatus('MP4 ' + fmt.quality + u.qpos + ' · ' + u.pct + '% · poll ' + u.attempt,
+                20 + Math.min(40, u.pct * 0.4));
+      setVideoSub(fmt.quality + ' · ' + u.st + ' ' + u.pct + '%' + u.qpos + ' — waiting for url');
+    }});
+    if (!m.fileUrl) throw new Error('No fileUrl in CDN response');
+    const size = m.fileSizeBytes || 0;
+    setVideoSub(fmt.quality + (size ? ' · ~' + fmtMB(size) : '') + ' · saving…');
+    await downloadAudio(m.fileUrl, (state.title || 'video') + ' ' + fmt.quality,
+                        { openFallback: true, size, ext: 'mp4', sub: t => setVideoSub(t) });
+  } catch (err) {
+    clearStatus();
+    if (!err || err.message !== 'cancelled')
+      toast(err.message || 'Video extraction failed — please try again.', 'err');
+    if (fmt) setVideoSub(fmt.quality + ' · not ready — try again');
+  } finally {
+    videoState.busy = false;
+    busy($('#rowVideo'), false);
+    $('#videoQ').disabled = false;
   }
 });
 
@@ -1407,6 +1761,16 @@ document.querySelectorAll('.seg').forEach(seg=>{
   });
 });
 
+/* ---------------- shortcuts cheat sheet ---------------- */
+const keyModal=$('#keyModal');
+function toggleKeys(force){
+  const on=force!==undefined?force:!keyModal.classList.contains('open');
+  keyModal.classList.toggle('open',on);
+  keyModal.setAttribute('aria-hidden',on?'false':'true');
+}
+$('#keyClose').addEventListener('click',()=>toggleKeys(false));
+keyModal.addEventListener('click',e=>{ if(e.target===keyModal) toggleKeys(false); });
+
 /* ---------------- immersive ---------------- */
 function toggleImmersive(force){
   const on = force!==undefined ? force : !document.body.classList.contains('immersive');
@@ -1416,11 +1780,17 @@ function toggleImmersive(force){
 
 /* ---------------- keyboard ---------------- */
 window.addEventListener('keydown',e=>{
+  const typing=e.target.matches('input,textarea,select');
   if(e.key==='Escape'){
     if(setModal.classList.contains('open')){ setModal.classList.remove('open'); return; }
+    if(keyModal.classList.contains('open')){ toggleKeys(false); return; }
     if(document.body.classList.contains('immersive')){ toggleImmersive(false); return; }
   }
-  if(e.target.matches('input,textarea')||setModal.classList.contains('open')) return;
+  if(!typing && !setModal.classList.contains('open') && !keyModal.classList.contains('open')){
+    if(e.key==='?'){ e.preventDefault(); toggleKeys(); return; }
+    if(e.key==='/'){ e.preventDefault(); const inp=$('#miniInput'); if(inp){ inp.focus(); inp.select(); } return; }
+  }
+  if(typing||setModal.classList.contains('open')||keyModal.classList.contains('open')) return;
   if(!hasTrack) return;
   switch(e.code){
     case 'Space': e.preventDefault(); togglePlay(); break;
