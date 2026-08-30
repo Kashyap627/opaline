@@ -594,7 +594,12 @@ let player=null, ytReady=false, pending=null;
 let hasTrack=false, playing=false, duration=0, volume=+(localStorage.getItem('opaline.vol') ?? 80);
 let prevVol = volume || 80;
 
-const DEFAULTS = { extraction:'scr', playback:'video' };
+/* playback default = 'audio' (the app's core MP3 engine). localStorage is
+   per-origin — a fresh deploy (e.g. GitHub Pages) has empty storage, so the
+   default decides the engine. 'video' default made fresh boots skip
+   resolveAudio() entirely (no resolver requests). YT-video fallback covers
+   resolution failures, and saved settings still override this default. */
+const DEFAULTS = { extraction:'scr', playback:'audio' };
 let settings = { ...DEFAULTS };
 try{ settings = { ...DEFAULTS, ...(JSON.parse(localStorage.getItem('opaline.settings'))||{}) }; }catch(e){}
 const saveSettings = () => localStorage.setItem('opaline.settings', JSON.stringify(settings));
