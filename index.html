@@ -942,6 +942,7 @@ async function startTrack(id, start=0){
       const r=await resolveAudio(id);
       useAudioEngine(r.url, start);
     }catch(err){
+      if (err && err.message === 'cancelled') return; /* a newer track took over */
       toast('Audio stream unavailable — playing the YouTube video instead','warn');
       engMode='yt'; mountPlayer(id,start);
     }
@@ -1210,24 +1211,51 @@ async function resolveAudio(videoId) {
     const cdnUrl = audioFormat.cdn_url;
     setStatus('Fetching metadata…', 40);
     
-    let metadata = null;
-    for (let attempt = 0; attempt < 2 && !metadata; attempt++) {
+    /* The CDN endpoint answers status:"queued" (or converting/downloading) for a
+       while before fileUrl appears — evidence: {"status":"queued","percent":"0%",
+       "totalWaiting":1}. Retry often (every 1.5s, up to 2 min) instead of failing
+       instantly, and surface live queue/percent feedback while waiting for the url. */
+    const sleep = ms => new Promise(r => setTimeout(r, ms));
+    const POLL_MS = 1500, POLL_BUDGET = 120000, t0 = Date.now();
+    const STUCK = ['error', 'failed'];
+    let metadata = null, netFails = 0, attempt = 0;
+
+    setStatus('Fetching metadata…', 40);
+    while (!metadata) {
+      attempt++;
+      if (Date.now() - t0 > POLL_BUDGET)
+        throw new Error('Still converting on the server — try again in a moment');
+      if (state.id && state.id !== videoId) throw new Error('cancelled');
       try {
-        if (attempt) await new Promise(r => setTimeout(r, 900));
         const metaRes = await fetch(cdnUrl, {
           method: 'GET',
           headers: { 'Accept': 'application/json' },
           cache: 'no-cache'
         });
         if (!metaRes.ok) throw new Error('CDN metadata fetch failed: ' + metaRes.status);
-        metadata = await metaRes.json();
-      } catch (metaErr) {
-        if (attempt === 1) throw new Error('Could not fetch metadata: ' + (metaErr.message || 'network error'));
+        const m = await metaRes.json();
+        const st = String(m.status || '').toLowerCase();
+        if (STUCK.includes(st))
+          throw new Error('Server-side conversion failed (' + st + ')');
+        if (st === 'completed' && m.fileUrl) { metadata = m; break; }
+        netFails = 0;
+        const pct = Math.round(parseFloat(m.percent) || parseFloat(m.progress) || 0);
+        const qpos = m.position ? ' · #' + m.position
+                  : (m.totalWaiting ? ' · ' + m.totalWaiting + ' in queue' : '');
+        setStatus('Server ' + (st || 'processing') + qpos + ' · ' + pct + '% · poll ' + attempt,
+                  40 + Math.min(22, pct * 0.22));
+        setAudioSub('MP3 · ' + (st || 'processing') + ' ' + pct + '% — waiting for url');
+      } catch (pollErr) {
+        if (/conversion failed/.test(pollErr.message)) throw pollErr;
+        netFails++;
+        if (netFails > 6)
+          throw new Error('Could not fetch metadata: ' + (pollErr.message || 'network error'));
+        setStatus('Retrying metadata… (' + netFails + '/6)', 40);
       }
+      await sleep(POLL_MS);
     }
     
     if (!metadata.fileUrl) throw new Error('No fileUrl in CDN response');
-    if (metadata.status !== 'completed') throw new Error('File conversion not completed');
     
     url = metadata.fileUrl;
     size = metadata.fileSizeBytes || 0;
@@ -1310,7 +1338,7 @@ async function downloadAudio(currentDownloadUrl, currentTitle, { openFallback = 
       await downloadAudio(r.url, state.title, { openFallback: true });
     }
   } catch (err) {
-    toast(err.message || 'Extraction failed — please try again.', 'err');
+    if (!err || err.message !== 'cancelled') toast(err.message || 'Extraction failed — please try again.', 'err');
   } finally {
     audioState.busy = false;
     busy($('#rowAudio'), false);
