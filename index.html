@@ -292,14 +292,57 @@ input[type=range]::-moz-range-thumb{width:12px;height:12px;border:0;border-radiu
 .f-go svg{width:16px;height:16px;display:block}
 .frow.busy .f-go{display:none}
 .frow.busy .spin{display:block;color:#fff}
-/* quality dropdown inside the video row */
-.vq{display:block;margin-top:5px;align-self:flex-start;max-width:100%;background:rgba(255,255,255,.07);
-  color:var(--ink);border:1px solid rgba(255,255,255,.14);border-radius:8px;padding:3px 8px;
+/* glass quality dropdown — download row + watch-here player */
+.vqw{position:relative;display:inline-flex;margin-top:5px;align-self:flex-start}
+.vqb{display:inline-flex;align-items:center;gap:6px;height:26px;padding:0 9px;border-radius:9px;
+  background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.14);color:var(--ink);
   font:600 11px 'Instrument Sans';cursor:pointer;transition:.2s}
-.vq:hover{border-color:rgba(255,255,255,.28)}
-.vq:focus{outline:none;border-color:var(--accent)}
-.vq:disabled{opacity:.5;cursor:default}
-.vq option{background:#241b2e;color:var(--ink)}
+.vqb:hover{background:rgba(255,255,255,.12);border-color:rgba(255,255,255,.3)}
+.vqb:disabled{opacity:.45;cursor:default}
+.vqb .chev{width:12px;height:12px;color:var(--ink-3);transition:transform .2s}
+.vqw.open .vqb .chev{transform:rotate(180deg)}
+.vqm{position:absolute;left:0;bottom:calc(100% + 8px);z-index:40;min-width:150px;padding:5px;
+  border-radius:13px;display:none;flex-direction:column;gap:2px}
+.vqw.open .vqm{display:flex;animation:qpop .18s cubic-bezier(.2,.7,.2,1)}
+@keyframes qpop{from{opacity:0;transform:translateY(5px)}}
+.vqi{display:flex;align-items:center;justify-content:space-between;gap:14px;padding:7px 10px;border-radius:9px;
+  background:none;border:0;color:var(--ink-2);font:600 12px 'Instrument Sans';cursor:pointer;
+  text-align:left;transition:.15s;white-space:nowrap}
+.vqi:hover{background:rgba(255,255,255,.09);color:var(--ink)}
+.vqi.on{color:var(--accent)}
+.vqi svg{width:13px;height:13px;flex:none}
+/* watch-here button in the video row */
+.vwatch{display:inline-flex;align-items:center;justify-content:center;width:34px;height:34px;border-radius:12px;
+  background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.11);color:var(--ink-2);
+  cursor:pointer;transition:.2s;flex:none;align-self:center}
+.vwatch:hover{background:rgba(255,181,71,.14);border-color:rgba(255,181,71,.4);color:var(--accent)}
+.vwatch svg{width:16px;height:16px}
+/* queue filter */
+.qsearch{display:flex;align-items:center;gap:8px;height:34px;padding:0 12px;border-radius:11px;
+  background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.1);margin-bottom:8px;transition:.2s}
+.qsearch:focus-within{border-color:rgba(255,181,71,.45)}
+.qsearch svg{width:13px;height:13px;color:var(--ink-3);flex:none}
+.qsearch input{flex:1;min-width:0;background:none;border:0;outline:0;color:var(--ink);font:500 12.5px 'Instrument Sans'}
+.qsearch input::placeholder{color:var(--ink-3)}
+.qempty{font-family:var(--serif);font-style:italic;font-size:13px;color:var(--ink-3);padding:14px 6px;text-align:center}
+/* watch-here video player modal */
+#vpModal{position:fixed;inset:0;z-index:70;display:grid;place-items:center;padding:20px;
+  background:rgba(8,8,11,.6);-webkit-backdrop-filter:blur(18px);backdrop-filter:blur(18px);
+  opacity:0;visibility:hidden;transition:.35s}
+#vpModal.open{opacity:1;visibility:visible}
+.vp-sheet{width:min(900px,100%);border-radius:24px;padding:18px 20px 16px;
+  transform:translateY(14px) scale(.98);transition:.35s cubic-bezier(.2,.7,.2,1)}
+#vpModal.open .vp-sheet{transform:none}
+.vp-stage{position:relative;border-radius:14px;overflow:hidden;background:#000;aspect-ratio:16/9}
+#vpVideo{width:100%;height:100%;display:block;background:#000;cursor:pointer}
+.vp-veil{position:absolute;inset:0;z-index:2;display:none;place-content:center;justify-items:center;gap:10px;
+  background:rgba(8,8,11,.62);-webkit-backdrop-filter:blur(4px);backdrop-filter:blur(4px)}
+.vp-veil.on{display:grid}
+.vp-veil .spin{display:block;width:18px;height:18px;color:var(--accent)}
+.vp-veil p{font-size:13px;color:var(--ink-2)}
+.vp-ctl{display:flex;align-items:center;gap:10px;margin-top:12px}
+.vp-sheet:fullscreen{width:100%;height:100%;max-height:none;border-radius:0;display:flex;flex-direction:column;justify-content:center}
+.vp-sheet:fullscreen .vp-stage{width:100%}
 /* marquee */
 .mq{overflow:hidden;white-space:nowrap;mask-image:linear-gradient(to right,transparent,#000 6%,#000 94%,transparent)}
 .mq-track{display:inline-block}
@@ -594,7 +637,10 @@ body.immersive{cursor:default}
         </button>
         <div class="frow" id="rowVideo" role="button" tabindex="0" title="Download video (MP4)">
           <span class="f-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m22 8-6 4 6 4V8Z"/><rect width="14" height="12" x="2" y="6" rx="2" ry="2"/></svg></span>
-          <span class="f-t"><b>Video (MP4)</b><span id="videoSub">MP4 · resolved on demand</span><select id="videoQ" class="vq hide" title="Video quality" aria-label="Video quality"></select></span>
+          <span class="f-t"><b>Video (MP4)</b><span id="videoSub">MP4 · pick a quality</span><span class="vqw hide" id="videoQw"><button type="button" class="vqb" id="videoQBtn" aria-haspopup="listbox" aria-expanded="false"><span class="vqb-l">Quality</span><svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg></button><span class="vqm glass glass-strong" id="videoQMenu" role="listbox"></span></span></span>
+          <span class="vwatch" id="btnWatch" role="button" tabindex="0" title="Watch it here — custom player with quality switch">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="m10 8 6 4-6 4V8Z"/></svg>
+          </span>
           <span class="f-go"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 15V3"/><path d="M7 10l5 5 5-5"/><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/></svg></span>
           <span class="spin"></span>
         </div>
@@ -607,6 +653,10 @@ body.immersive{cursor:default}
           <button class="icon-btn sm" id="qClear" title="Clear queue">
             <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>
           </button>
+        </div>
+        <div class="qsearch">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
+          <input id="qSearch" type="text" placeholder="Filter tracks — title or channel" spellcheck="false">
         </div>
         <div class="qlist" id="qList"></div>
       </div>
@@ -664,6 +714,51 @@ body.immersive{cursor:default}
     <div class="krow"><span>Close overlay / back</span><kbd>Esc</kbd></div>
     <p class="fine">Media keys and lock-screen controls work too — Opaline registers with your OS through
       the Media Session API. With a playlist queued, the previous / next buttons skip tracks.</p>
+  </div>
+</div>
+
+<!-- watch here — custom video player -->
+<div id="vpModal" aria-hidden="true">
+  <div class="vp-sheet glass glass-strong" id="vpSheet">
+    <div class="sh-head">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m22 8-6 4 6 4V8Z"/><rect width="14" height="12" x="2" y="6" rx="2" ry="2"/></svg>
+      <h2 id="vpTitle">Video player</h2>
+      <button class="icon-btn sm" id="vpClose" title="Close">
+        <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>
+      </button>
+    </div>
+    <div class="vp-stage" id="vpStage">
+      <video id="vpVideo" playsinline preload="auto"></video>
+      <div class="vp-veil" id="vpVeil">
+        <span class="spin"></span>
+        <p id="vpMsg">Loading…</p>
+      </div>
+    </div>
+    <div class="vp-ctl">
+      <button class="skip" id="vpPlay" title="Play / Pause">
+        <span id="vpIcoPlay"><svg viewBox="0 0 24 24" width="19" height="19" fill="currentColor"><path d="M8.5 5.9v12.2a1 1 0 0 0 1.55.83l9.6-6.1a1 1 0 0 0 0-1.66l-9.6-6.1a1 1 0 0 0-1.55.83z"/></svg></span>
+        <span id="vpIcoPause" class="hide"><svg viewBox="0 0 24 24" width="19" height="19" fill="currentColor"><rect x="7" y="5" width="3.6" height="14" rx="1.3"/><rect x="13.4" y="5" width="3.6" height="14" rx="1.3"/></svg></span>
+      </button>
+      <span class="time" id="vpCur">0:00</span>
+      <div class="timeline" id="vpTl">
+        <div class="tl-track">
+          <div class="tl-buffer" id="vpBuf"></div>
+          <div class="tl-fill" id="vpFill"></div>
+          <div class="tl-thumb" id="vpThumb"></div>
+        </div>
+        <div class="tl-tip" id="vpTip">0:00</div>
+      </div>
+      <span class="time" id="vpRem">–:––</span>
+      <div class="vqw" id="vpQw">
+        <button type="button" class="vqb" id="vpQBtn" aria-haspopup="listbox" aria-expanded="false"><span class="vqb-l">Quality</span><svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg></button>
+        <span class="vqm glass glass-strong" id="vpQMenu" role="listbox"></span>
+      </div>
+      <input type="range" id="vpVol" min="0" max="100" value="80" title="Volume">
+      <button class="icon-btn" id="vpFs" title="Fullscreen">
+        <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M8 3H5a2 2 0 0 0-2 2v3"/><path d="M21 8V5a2 2 0 0 0-2-2h-3"/><path d="M3 16v3a2 2 0 0 0 2 2h3"/><path d="M16 21h3a2 2 0 0 0 2-2v-3"/></svg>
+      </button>
+    </div>
+    <p class="fine" style="margin-top:10px">Streams from the same pipeline as the downloads — switch quality anytime, the position carries over. <kbd>Space</kbd> play · <kbd>←</kbd><kbd>→</kbd> seek · <kbd>Esc</kbd> close</p>
   </div>
 </div>
 
@@ -1033,8 +1128,8 @@ async function startTrack(id, start=0){
   paintScrub(0); $('#tlBuf').style.width='0%';
   hideVeil(); setPlayUI(false);
   if(audioState.id !== id){ audioState.id=null; audioState.url=null; audioState.size=0; }
-  setAudioSub('MP3 · resolved on demand');
-  $('#videoQ').classList.add('hide'); $('#videoQ').innerHTML=''; setVideoSub('MP4 · resolved on demand');
+  setAudioSub('MP3 · ready when you are');
+  dlQ.hide(); dlQ.set([],null); setVideoSub('MP4 · pick a quality');
   setArt(id);
   goPlayer();
   let rs=start||0, resumed=false;
@@ -1213,6 +1308,7 @@ async function fetchPlaylist(listId){
   }finally{ clearTimeout(kill); }
 }
 const queue={ items:[], idx:-1, meta:null };
+let qFilter='';
 function queueActive(){ return queue.items.length>1; }
 function srcLabel(fallback){
   return queueActive() ? ((queue.meta?'PLAYLIST':'QUEUE')+' · '+(queue.idx+1)+'/'+queue.items.length) : fallback;
@@ -1222,6 +1318,7 @@ function queueSet(items, idx, meta){
   queue.items=items||[];
   queue.idx=queue.items.length?Math.max(0,Math.min(idx|0,queue.items.length-1)):-1;
   queue.meta=meta||null;
+  qFilter=''; const qs=$('#qSearch'); if(qs) qs.value='';
   paintQueue(); msBindActions();
 }
 function paintQueue(){
@@ -1233,7 +1330,14 @@ function paintQueue(){
   $('#qInfo').textContent=(queue.meta&&queue.meta.creator?queue.meta.creator+' · ':'')
     +queue.items.length+' tracks · '+fmt(tot)
     +(queue.meta&&queue.meta.total>queue.items.length?' · of '+queue.meta.total:'');
-  $('#qList').innerHTML=queue.items.map((it,i)=>`
+  const f=qFilter.toLowerCase();
+  const shown=queue.items.map((it,i)=>({it,i}))
+    .filter(x=>!f||(x.it.title+' '+(x.it.channel||'')).toLowerCase().includes(f));
+  if(!shown.length){
+    $('#qList').innerHTML='<div class="qempty">Nothing matches “'+esc(qFilter)+'” here</div>';
+    return;
+  }
+  $('#qList').innerHTML=shown.map(({it,i})=>`
     <button class="qrow${i===queue.idx?' on':''}" data-i="${i}" title="${esc(it.title)}">
       <span class="qi">${i===queue.idx?'▶':(i+1)}</span>
       <img src="${thumbFor(it.id)}" alt="" draggable="false" loading="lazy">
@@ -1260,8 +1364,10 @@ function paintQueue(){
       else{ paintQueue(); msBindActions(); }
     });
   });
-  const cur=$('#qList').querySelector('.qrow.on');
-  if(cur) cur.scrollIntoView({block:'nearest'});
+  if(!qFilter){
+    const cur=$('#qList').querySelector('.qrow.on');
+    if(cur) cur.scrollIntoView({block:'nearest'});
+  }
 }
 function queuePlay(i){
   const it=queue.items[i]; if(!it) return;
@@ -1289,11 +1395,13 @@ async function loadPlaylist(listId, focusId){
     queueSet(data.videos, idx, { title:data.title, creator:data.creator, total:data.total });
     toast('Queued '+data.videos.length+' tracks — '+data.title);
     if(!focusId||state.id!==data.videos[idx].id) queuePlay(idx);   /* already playing that one? just show the queue */
+    else schedulePrefetch(1500);   /* started from the video — queue the rest + prefetch ahead */
   }catch(err){
     if(seq===plSeq) toast('Playlist load failed — playing just this video','warn');
   }
 }
 $('#qClear').addEventListener('click',()=>{ queueSet([],-1,null); resetSrcLabel(); toast('Queue cleared','info'); });
+$('#qSearch').addEventListener('input',()=>{ qFilter=$('#qSearch').value.trim(); paintQueue(); });
 $('#histPlayAll').addEventListener('click',()=>{
   const h=loadHist(); if(!h.length) return toast('History is empty','info');
   queueSet(h.map(x=>({ id:x.id, title:x.title||'Untitled', channel:x.author||'', sec:0 })), 0, null);
@@ -1380,7 +1488,9 @@ function setVol(v){
   volume=Math.round(Math.min(100,Math.max(0,v)));
   if(engMode==='audio'){ if(A) A.volume=volume/100; }
   else if(player&&player.setVolume) player.setVolume(volume);
+  if(typeof vpVideo!=='undefined' && vpVideo) vpVideo.volume=volume/100;
   $('#vol').value=volume; $('#vol').style.setProperty('--vol',volume+'%');
+  const vpVol=$('#vpVol'); if(vpVol){ vpVol.value=volume; vpVol.style.setProperty('--vol',volume+'%'); }
   volIcon(); localStorage.setItem('opaline.vol',volume);
 }
  $('#vol').addEventListener('input',()=>setVol(+$('#vol').value));
@@ -1450,6 +1560,14 @@ function setBar(pct){ if(pct!=null) $('#sbarFill').style.width=pct+'%'; }
 function clearStatus(){ setTimeout(()=>$('#schip').classList.add('hide'), 900); }
 const setAudioSub = t => { $('#audioSub').textContent = t; };
 function busy(row,on){ row.classList.toggle('busy',on); }
+/* resolver copy for humans — no server names, no pipeline jargon, no poll counters */
+function friendlyPoll(prefix, u){
+  if(u.kind==='retry') return 'Reconnecting… ('+u.n+'/6)';
+  const word = u.st==='queued' ? 'Waiting' : 'Preparing';
+  return (prefix?prefix+' · ':'')+word+(u.qpos||'')+(u.pct?' · '+u.pct+'%':'');
+}
+const waitSub = (prefix, st, pct) =>
+  prefix+' · '+(st==='queued'?'waiting in line':'preparing')+(pct?' · '+pct+'%':'');
 
 /* ============================================================
    AUDIO EXTRACTION — scr one-shot / legacy token, direct requests
@@ -1471,15 +1589,15 @@ async function verifyStream(url) {
 }
 const audioState = { id:null, url:null, size:0, busy:false };
 const videoState = { busy:false };
-const formatCache = { id:null, data:null, ts:0 };
+const formatCache = new Map();   // videoId -> { data, ts } — several videos may be in flight (prefetch)
 const setVideoSub = t => { $('#videoSub').textContent = t; };
 
 /* ONE details call serves everything: audio streaming, the MP3 download row
    and the video quality dropdown. cdn_url job links stay valid, so cache
    per video for 10 min and reuse across all three consumers. */
 async function fetchFormats(videoId) {
-  if (formatCache.id === videoId && formatCache.data && Date.now() - formatCache.ts < 600000)
-    return formatCache.data;
+  const c = formatCache.get(videoId);
+  if (c && Date.now() - c.ts < 600000) return c.data;
   const res = await fetch('https://api.youtubetomp.com/api/downloader/youtube/details', {
     method: 'POST',
     headers: { 'content-type': 'application/json' },
@@ -1489,7 +1607,9 @@ async function fetchFormats(videoId) {
   if (!res.ok) throw new Error('API returned status ' + res.status);
   const j = await res.json();
   if (!j.success || !j.data) throw new Error('Invalid API response');
-  formatCache.id = videoId; formatCache.data = j.data; formatCache.ts = Date.now();
+  formatCache.set(videoId, { data: j.data, ts: Date.now() });
+  if (formatCache.size > 4 && formatCache.keys().next().value !== videoId)
+    formatCache.delete(formatCache.keys().next().value);
   return j.data;
 }
 
@@ -1499,7 +1619,7 @@ async function fetchFormats(videoId) {
    budget — instead of failing instantly; onPoll surfaces live feedback.
    Used by both the MP3 path and every MP4 quality. */
 const POLL_MS = 1500;
-async function pollCdn(videoId, cdnUrl, { budget = 120000, onPoll = () => {} } = {}) {
+async function pollCdn(videoId, cdnUrl, { budget = 120000, onPoll = () => {}, background = false } = {}) {
   const sleep = ms => new Promise(r => setTimeout(r, ms));
   const STUCK = ['error', 'failed'];
   const t0 = Date.now();
@@ -1507,8 +1627,8 @@ async function pollCdn(videoId, cdnUrl, { budget = 120000, onPoll = () => {} } =
   while (!metadata) {
     attempt++;
     if (Date.now() - t0 > budget)
-      throw new Error('Still converting on the server — the job stays queued, click again in a bit');
-    if (state.id && state.id !== videoId) throw new Error('cancelled'); // user moved on
+      throw new Error('This one is taking longer than expected — try again in a bit');
+    if (!background && state.id && state.id !== videoId) throw new Error('cancelled'); // user moved on
     try {
       const metaRes = await fetch(cdnUrl, {
         method: 'GET',
@@ -1519,18 +1639,18 @@ async function pollCdn(videoId, cdnUrl, { budget = 120000, onPoll = () => {} } =
       const m = await metaRes.json();
       const st = String(m.status || '').toLowerCase();
       if (STUCK.includes(st))
-        throw new Error('Server-side conversion failed (' + st + ')');
+        throw new Error('That file could not be prepared — try another quality');
       if (st === 'completed' && m.fileUrl) { metadata = m; break; }
       netFails = 0;
       const pct = Math.round(parseFloat(m.percent) || parseFloat(m.progress) || 0);
-      const qpos = m.position ? ' · #' + m.position
+      const qpos = m.position ? ' · position ' + m.position
                 : (m.totalWaiting ? ' · ' + m.totalWaiting + ' in queue' : '');
       onPoll({ kind: 'progress', st: st || 'processing', pct, qpos, attempt });
     } catch (pollErr) {
-      if (/conversion failed/.test(pollErr.message)) throw pollErr;
+      if (/could not be prepared/.test(pollErr.message)) throw pollErr;
       netFails++;
       if (netFails > 6)
-        throw new Error('Could not fetch metadata: ' + (pollErr.message || 'network error'));
+        throw new Error('Connection trouble — please try again');
       onPoll({ kind: 'retry', n: netFails, msg: pollErr.message });
     }
     await sleep(POLL_MS);
@@ -1538,31 +1658,91 @@ async function pollCdn(videoId, cdnUrl, { budget = 120000, onPoll = () => {} } =
   return metadata;
 }
 
+/* One quiet extractor shared by live playback and background prefetch. */
+async function extractAudioUrl(videoId, { budget = 120000, background = false, onPoll = () => {}, onStage = () => {} } = {}) {
+  const data = await fetchFormats(videoId);
+  const f = (data.formats || []).find(f => f.audio_only);
+  if (!f || !f.cdn_url) throw new Error('No audio format available');
+  const m = await pollCdn(videoId, f.cdn_url, { budget, background, onPoll });
+  if (!m.fileUrl) throw new Error('No fileUrl in CDN response');
+  onStage('verify');
+  await verifyStream(m.fileUrl);
+  return { url: m.fileUrl, size: m.fileSizeBytes || 0 };
+}
+
+/* ---------------- queue prefetch — have the next tracks ready early --------
+   While the current song plays, quietly resolve the audio links for the next
+   three queue tracks, so auto-advance feels instant. One server job at a
+   time, silent failures, small LRU cache. */
+const preCache = new Map();     // videoId -> { url, size }
+const prePending = new Map();   // videoId -> Promise<{url,size}|null>
+let preTimer = null, preRunning = false;
+function schedulePrefetch(delay = 2200){
+  if(!queueActive()) return;
+  clearTimeout(preTimer);
+  preTimer = setTimeout(runPrefetch, delay);
+}
+async function runPrefetch(){
+  if(preRunning || !queueActive() || settings.playback !== 'audio') return;
+  preRunning = true;
+  try{
+    for(let off = 1; off <= 3; off++){
+      if(!queueActive()) break;
+      const i = queue.idx + off;
+      if(i < 0 || i >= queue.items.length) break;
+      const id = queue.items[i].id;
+      if(id === state.id || preCache.has(id) || prePending.has(id)) continue;
+      const p = extractAudioUrl(id, { background: true }).catch(() => null);
+      prePending.set(id, p);
+      const r = await p;                    /* sequential — stay polite to the resolver */
+      prePending.delete(id);
+      if(!queueActive()) break;
+      if(r && r.url){
+        preCache.set(id, r);
+        if(preCache.size > 6) preCache.delete(preCache.keys().next().value);
+      }
+    }
+  }finally{ preRunning = false; }
+}
+
 async function resolveAudio(videoId) {
+  /* prefetched for this queue slot? then it is instant */
+  if(preCache.has(videoId)){
+    const r = preCache.get(videoId); preCache.delete(videoId);
+    audioState.id = videoId; audioState.url = r.url; audioState.size = r.size || 0;
+    setStatus(r.size ? 'Ready · '+fmtMB(r.size) : 'Ready', 100);
+    setAudioSub(r.size ? 'MP3 · '+fmtMB(r.size)+' · ready' : 'MP3 · link ready');
+    clearStatus(); schedulePrefetch();
+    return { url: r.url, size: r.size || 0 };
+  }
+  /* being prefetched right now? ride along — but only briefly */
+  if(prePending.has(videoId)){
+    const r = await Promise.race([
+      prePending.get(videoId),
+      new Promise(res => setTimeout(() => res(null), 8000))
+    ]);
+    if(r && r.url){
+      prePending.delete(videoId);
+      audioState.id = videoId; audioState.url = r.url; audioState.size = r.size || 0;
+      setStatus(r.size ? 'Ready · '+fmtMB(r.size) : 'Ready', 100);
+      setAudioSub(r.size ? 'MP3 · '+fmtMB(r.size)+' · ready' : 'MP3 · link ready');
+      clearStatus(); schedulePrefetch();
+      return { url: r.url, size: r.size || 0 };
+    }
+  }
   try {
-    setStatus('Fetching YoutubetoMP…', 15);
-    const data = await fetchFormats(videoId);
-    const audioFormat = (data.formats || []).find(f => f.audio_only);
-    if (!audioFormat || !audioFormat.cdn_url) throw new Error('No audio format available');
-
-    const metadata = await pollCdn(videoId, audioFormat.cdn_url, { budget: 120000, onPoll: u => {
-      if (u.kind === 'retry') { setStatus('Retrying metadata… (' + u.n + '/6)', 40); return; }
-      setStatus('Server ' + u.st + u.qpos + ' · ' + u.pct + '% · poll ' + u.attempt,
-                40 + Math.min(22, u.pct * 0.22));
-      setAudioSub('MP3 · ' + u.st + ' ' + u.pct + '% — waiting for url');
-    }});
-
-    if (!metadata.fileUrl) throw new Error('No fileUrl in CDN response');
-    const url = metadata.fileUrl;
-    const size = metadata.fileSizeBytes || 0;
-    setStatus('Verifying stream…', 65);
-
-    const v = await verifyStream(url);
-    audioState.id = videoId; audioState.url = url; audioState.size = size || v.size || 0;
+    setStatus('Loading…', 15);
+    const { url, size } = await extractAudioUrl(videoId, { onPoll: u => {
+      if (u.kind === 'retry') { setStatus('Reconnecting… (' + u.n + '/6)', 40); setAudioSub('MP3 · reconnecting…'); return; }
+      setStatus(friendlyPoll('', u), 40 + Math.min(22, u.pct * 0.22));
+      setAudioSub(waitSub('MP3', u.st, u.pct));
+    }, onStage: () => setStatus('Almost ready…', 65) });
+    audioState.id = videoId; audioState.url = url; audioState.size = size;
     setStatus(size ? 'Ready · '+fmtMB(size) : 'Ready', 100);
-    setAudioSub(size ? 'MP3 · ' + fmtMB(size) + ' · ready' : 'MP3 · link ready');
+    setAudioSub(size ? 'MP3 · '+fmtMB(size)+' · ready' : 'MP3 · link ready');
     clearStatus();
-    return { url, size: size || 0 };
+    schedulePrefetch();
+    return { url, size };
   } catch (err) {
     clearStatus();
     audioState.id = null; audioState.url = null; audioState.size = 0;
@@ -1641,51 +1821,90 @@ async function downloadAudio(currentDownloadUrl, currentTitle, { openFallback = 
   }
 });
 
-/* ---------------- video (MP4) download · quality dropdown ---------------- */
+/* ---------------- video (MP4) download · glass quality dropdown ------------ */
+function escHtml(s){ return String(s).replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c])); }
 const videoFmts = data => (data.formats || []).filter(f => !f.audio_only && f.cdn_url)
                           .sort((a, b) => (b.height || 0) - (a.height || 0));
-function escHtml(s){ return String(s).replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c])); }
+
+/* A small dropdown that looks like the rest of Opaline — glass pill, upward
+   menu, check on the active row. Used by the download row AND the player. */
+function qDropdown(wrapSel, onPick){
+  const w = $(wrapSel), btn = w.querySelector('.vqb'), lbl = w.querySelector('.vqb-l'), menu = w.querySelector('.vqm');
+  let items = [], value = null;
+  const paint = () => {
+    const cur = items.find(i => i.q === value);
+    lbl.textContent = cur ? cur.label : 'Quality';
+    menu.innerHTML = items.map(i => `
+      <button type="button" class="vqi${i.q === value ? ' on' : ''}" data-q="${escHtml(i.q)}" role="option" aria-selected="${i.q === value}">
+        ${escHtml(i.label)}
+        ${i.q === value ? '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg>' : ''}
+      </button>`).join('');
+  };
+  btn.addEventListener('click', e => {
+    e.stopPropagation();
+    if (btn.disabled || !items.length) return;
+    w.classList.toggle('open');
+    w.setAttribute('aria-expanded', w.classList.contains('open'));
+  });
+  menu.addEventListener('click', e => {
+    const b = e.target.closest('.vqi'); if (!b) return;
+    e.stopPropagation();
+    value = b.dataset.q;
+    w.classList.remove('open'); w.setAttribute('aria-expanded','false');
+    paint();
+    if (onPick) onPick(value);
+  });
+  return {
+    set(list, val){ items = list || []; value = val; if(!items.some(i => i.q === value)) value = items.length ? items[0].q : null; paint(); },
+    pick(v){ if (items.some(i => i.q === v)) { value = v; paint(); } },
+    get value(){ return value; },
+    get count(){ return items.length; },
+    show(){ w.classList.remove('hide'); paint(); },
+    hide(){ w.classList.add('hide'); w.classList.remove('open'); },
+    close(){ w.classList.remove('open'); w.setAttribute('aria-expanded','false'); },
+    set disabled(b){ btn.disabled = b; w.classList.toggle('disabled', b); }
+  };
+}
+document.addEventListener('click', e => {   /* outside click closes any open dropdown */
+  document.querySelectorAll('.vqw.open').forEach(w => { if (!w.contains(e.target)) w.classList.remove('open'); });
+});
+
+const dlQ = qDropdown('#videoQw', q => sessionStorage.setItem('opaline.vq', q));
 function fillVideoQ(data) {
-  const sel = $('#videoQ'), list = videoFmts(data);
+  const list = videoFmts(data).map(f => ({ q: f.quality, label: (f.label || f.quality).replace(/^MP4\s+/i, '') }));
   const prev = sessionStorage.getItem('opaline.vq') || '';
-  sel.innerHTML = list.map(f =>
-    `<option value="${escHtml(f.quality)}"${f.quality === prev ? ' selected' : ''}>${escHtml((f.label || f.quality).replace(/^MP4\s+/i, ''))}</option>`).join('');
-  sel.classList.toggle('hide', !list.length);
-  if (list.length && !list.some(f => f.quality === prev))
-    sessionStorage.setItem('opaline.vq', list[0].quality); // remember first pick next time
+  dlQ.set(list, list.some(i => i.q === prev) ? prev : null);
+  if (list.length) dlQ.show(); else dlQ.hide();
   return list;
 }
 function currentVideoFmt(data) {
-  const sel = $('#videoQ'), list = videoFmts(data);
-  return list.find(f => f.quality === sel.value) || list[0] || null;
+  const v = dlQ.value;
+  return videoFmts(data).find(f => f.quality === v) || videoFmts(data)[0] || null;
 }
-$('#videoQ').addEventListener('click', e => e.stopPropagation()); // picking a quality ≠ download click
-$('#videoQ').addEventListener('change', () => sessionStorage.setItem('opaline.vq', $('#videoQ').value));
 
 $('#rowVideo').addEventListener('click', async e => {
-  if (e.target.closest('select')) return;
+  if (e.target.closest('.vqw') || e.target.closest('#btnWatch')) return;
   if (!state.id) return toast('Load a track first', 'info');
   if (videoState.busy) return;
   videoState.busy = true;
   busy($('#rowVideo'), true);
-  $('#videoQ').disabled = true;
+  dlQ.disabled = true;
   let fmt = null;
   try {
     const data = await fetchFormats(state.id);
     fillVideoQ(data);
     fmt = currentVideoFmt(data);
     if (!fmt) throw new Error('No video format available');
-    setVideoSub(fmt.quality + ' · resolving…');
-    setStatus('Resolving MP4 ' + fmt.quality + '…', 20);
+    setVideoSub(fmt.quality + ' · loading…');
+    setStatus('Loading ' + fmt.quality + '…', 20);
     const m = await pollCdn(state.id, fmt.cdn_url, { budget: 240000, onPoll: u => {
       if (u.kind === 'retry') {
-        setStatus('Retrying metadata… (' + u.n + '/6)', 40);
-        setVideoSub(fmt.quality + ' · retrying (' + u.n + '/6)');
+        setStatus('Reconnecting… (' + u.n + '/6)', 40);
+        setVideoSub(fmt.quality + ' · reconnecting (' + u.n + '/6)');
         return;
       }
-      setStatus('MP4 ' + fmt.quality + u.qpos + ' · ' + u.pct + '% · poll ' + u.attempt,
-                20 + Math.min(40, u.pct * 0.4));
-      setVideoSub(fmt.quality + ' · ' + u.st + ' ' + u.pct + '%' + u.qpos + ' — waiting for url');
+      setStatus(friendlyPoll(fmt.quality, u), 20 + Math.min(40, u.pct * 0.4));
+      setVideoSub(waitSub(fmt.quality, u.st, u.pct));
     }});
     if (!m.fileUrl) throw new Error('No fileUrl in CDN response');
     const size = m.fileSizeBytes || 0;
@@ -1700,9 +1919,140 @@ $('#rowVideo').addEventListener('click', async e => {
   } finally {
     videoState.busy = false;
     busy($('#rowVideo'), false);
-    $('#videoQ').disabled = false;
+    dlQ.disabled = false;
   }
 });
+
+/* ---------------- watch it here — custom in-app video player --------------
+   Same extraction pipeline as the MP4 download, wrapped in Opaline's own
+   controls: scrub bar, volume, fullscreen and a quality menu that swaps the
+   stream without losing your position. */
+const vpModal=$('#vpModal'), vpVideo=$('#vpVideo'), vpVeil=$('#vpVeil'), vpMsg=$('#vpMsg'),
+      vpFill=$('#vpFill'), vpThumb=$('#vpThumb'), vpBuf=$('#vpBuf'), vpTl=$('#vpTl');
+const vp = { on:false, id:null, seq:0, cache:new Map() };   /* cache: 'id:quality' -> url */
+function vpShowVeil(msg){ vpMsg.textContent=msg; vpVeil.classList.add('on'); }
+function vpHideVeil(){ vpVeil.classList.remove('on'); }
+function vpSetUI(p){ $('#vpIcoPlay').classList.toggle('hide',p); $('#vpIcoPause').classList.toggle('hide',!p); }
+function vpPaint(f){ vpFill.style.width=(f*100)+'%'; vpThumb.style.left=(f*100)+'%'; }
+const vpQ = qDropdown('#vpQw', q => {
+  sessionStorage.setItem('opaline.vq', q);
+  if(vp.id) vpStart(vp.id, q, true);   /* swap stream, keep position */
+});
+
+async function vpStart(id, wantQ, keepPos){
+  const seq = ++vp.seq;
+  try{
+    vpShowVeil('Loading…');
+    const data = await fetchFormats(id);
+    if(seq !== vp.seq) return;
+    const list = videoFmts(data).map(f => ({ q: f.quality, label: (f.label || f.quality).replace(/^MP4\s+/i, '') }));
+    if(!list.length){ vpShowVeil('No downloadable video for this one — the MP3 still works'); return; }
+    const q = list.some(i => i.q === wantQ) ? wantQ : list[0].q;
+    vpQ.set(list, q); sessionStorage.setItem('opaline.vq', q);
+    const fmt = videoFmts(data).find(f => f.quality === q);
+    const key = id + ':' + q;
+    let url = vp.cache.get(key);
+    if(!url){
+      const m = await pollCdn(id, fmt.cdn_url, { budget: 240000, onPoll: u => {
+        if(seq !== vp.seq) return;
+        vpShowVeil(u.kind === 'retry' ? 'Reconnecting… ('+u.n+'/6)' : friendlyPoll(q, u));
+      }});
+      if(seq !== vp.seq) return;
+      if(!m.fileUrl) throw new Error('No fileUrl in CDN response');
+      url = m.fileUrl;
+      vp.cache.set(key, url);
+      if(vp.cache.size > 8) vp.cache.delete(vp.cache.keys().next().value);
+    }
+    if(seq !== vp.seq) return;
+    const keepT = keepPos ? (vpVideo.currentTime || 0) : 0;
+    const wasPlaying = keepPos ? !vpVideo.paused : true;
+    vp.id = id;
+    vpVideo.poster = 'https://i.ytimg.com/vi/' + id + '/hqdefault.jpg';
+    vpVideo.src = url;
+    vpPaint(0); vpHideVeil();
+    const onMeta = () => {
+      vpVideo.removeEventListener('loadedmetadata', onMeta);
+      if(keepPos && keepT > 1){ try{ vpVideo.currentTime = Math.min(keepT, (vpVideo.duration || keepT) - 0.2); }catch(e){} }
+      if(keepPos && !wasPlaying) vpVideo.pause();
+    };
+    vpVideo.addEventListener('loadedmetadata', onMeta);
+    const pr = vpVideo.play();
+    if(pr && pr.catch) pr.catch(() => vpSetUI(false));
+  }catch(err){
+    if(seq === vp.seq)
+      vpShowVeil(err && err.message === 'cancelled' ? 'Switched tracks'
+        : (err && err.message ? err.message : 'Could not load the video — try again in a bit'));
+  }
+}
+function openVp(){
+  if(!state.id) return toast('Load a track first','info');
+  if(playing) togglePlay();                    /* one sound at a time */
+  vp.on = true;
+  vpModal.classList.add('open'); vpModal.setAttribute('aria-hidden','false');
+  $('#vpTitle').textContent = state.title || 'Video player';
+  const vv = $('#vpVol'); vv.value = volume; vv.style.setProperty('--vol', volume + '%');
+  vpStart(state.id, sessionStorage.getItem('opaline.vq') || null, false);
+}
+function closeVp(){
+  vp.on = false; vp.seq++;
+  try{ vpVideo.pause(); }catch(e){}
+  vpModal.classList.remove('open'); vpModal.setAttribute('aria-hidden','true');
+  if(document.fullscreenElement && document.exitFullscreen) document.exitFullscreen().catch(()=>{});
+}
+$('#btnWatch').addEventListener('click', e => { e.stopPropagation(); openVp(); });
+$('#btnWatch').addEventListener('keydown', e => {
+  if(e.key === 'Enter' || e.key === ' '){ e.preventDefault(); e.stopPropagation(); openVp(); }
+});
+$('#vpClose').addEventListener('click', closeVp);
+vpModal.addEventListener('click', e => { if(e.target === vpModal) closeVp(); });
+$('#vpPlay').addEventListener('click', () => {
+  if(!vpVideo.src) return;
+  vpVideo.paused ? vpVideo.play().catch(()=>{}) : vpVideo.pause();
+});
+vpVideo.addEventListener('click', () => {
+  if(vpVideo.src) vpVideo.paused ? vpVideo.play().catch(()=>{}) : vpVideo.pause();
+});
+vpVideo.addEventListener('play',  () => vpSetUI(true));
+vpVideo.addEventListener('pause', () => vpSetUI(false));
+vpVideo.addEventListener('loadedmetadata', () => { $('#vpRem').textContent = '-' + fmt(vpVideo.duration); });
+vpVideo.addEventListener('error', () => { if(vp.on && vpVideo.src) vpShowVeil('Stream hiccup — try another quality or reopen'); });
+vpVideo.addEventListener('waiting', () => { if(vp.on) vpShowVeil('Buffering…'); });
+vpVideo.addEventListener('playing', () => { if(vp.on) vpHideVeil(); });
+$('#vpFs').addEventListener('click', () => {
+  if(document.fullscreenElement) document.exitFullscreen().catch(()=>{});
+  else if($('#vpSheet').requestFullscreen) $('#vpSheet').requestFullscreen().catch(()=>{});
+});
+$('#vpVol').addEventListener('input', () => setVol(+$('#vpVol').value));
+/* vp scrub bar — mirrors the main timeline behaviour */
+(()=>{
+  let dragging=false, frac=0;
+  const fracOf=e => { const r=vpTl.getBoundingClientRect(); return Math.min(1,Math.max(0,(e.clientX-r.left)/r.width)); };
+  vpTl.addEventListener('pointerdown', e => {
+    if(!vpVideo.duration) return;
+    dragging=true; frac=fracOf(e); vpTl.classList.add('dragging'); vpTl.setPointerCapture(e.pointerId); vpPaint(frac);
+  });
+  vpTl.addEventListener('pointermove', e => {
+    const f=fracOf(e);
+    if(dragging){ frac=f; vpPaint(f); }
+    else if(vpVideo.duration){ $('#vpTip').classList.add('on'); $('#vpTip').style.left=(f*100)+'%'; $('#vpTip').textContent=fmt(f*vpVideo.duration); }
+  });
+  vpTl.addEventListener('pointerup', () => {
+    if(!dragging) return;
+    dragging=false; vpTl.classList.remove('dragging');
+    if(vpVideo.duration) vpVideo.currentTime=frac*vpVideo.duration;
+  });
+  vpTl.addEventListener('pointerleave', () => $('#vpTip').classList.remove('on'));
+})();
+setInterval(() => {                            /* vp progress ticker */
+  if(!vp.on || !vpVideo.src) return;
+  if(vpVideo.buffered.length && vpVideo.duration)
+    vpBuf.style.width=((vpVideo.buffered.end(vpVideo.buffered.length-1)/vpVideo.duration)*100)+'%';
+  if(vpVideo.duration && !vpTl.classList.contains('dragging')){
+    vpPaint(vpVideo.currentTime/vpVideo.duration);
+    $('#vpCur').textContent=fmt(vpVideo.currentTime);
+    $('#vpRem').textContent='-'+fmt(Math.max(0,vpVideo.duration-vpVideo.currentTime));
+  }
+}, 250);
 
 /* ---------------- cover / copy / open ---------------- */
  $('#rowCover').addEventListener('click',async()=>{
@@ -1783,8 +2133,18 @@ window.addEventListener('keydown',e=>{
   const typing=e.target.matches('input,textarea,select');
   if(e.key==='Escape'){
     if(setModal.classList.contains('open')){ setModal.classList.remove('open'); return; }
+    if(vp.on){ closeVp(); return; }
     if(keyModal.classList.contains('open')){ toggleKeys(false); return; }
     if(document.body.classList.contains('immersive')){ toggleImmersive(false); return; }
+    if(e.target&&e.target.id==='qSearch'){ e.target.blur(); return; }
+  }
+  if(vp.on){                                   /* the watch-here player owns the keys */
+    if(typing) return;
+    if(e.code==='Space'){ e.preventDefault(); $('#vpPlay').click(); }
+    else if(e.code==='ArrowLeft'){ e.preventDefault(); if(vpVideo.duration) vpVideo.currentTime=Math.max(0,vpVideo.currentTime-5); }
+    else if(e.code==='ArrowRight'){ e.preventDefault(); if(vpVideo.duration) vpVideo.currentTime=Math.min(vpVideo.duration-0.2,vpVideo.currentTime+5); }
+    else if(e.code==='KeyM'){ toggleMute(); }
+    return;
   }
   if(!typing && !setModal.classList.contains('open') && !keyModal.classList.contains('open')){
     if(e.key==='?'){ e.preventDefault(); toggleKeys(); return; }
@@ -1857,6 +2217,7 @@ const viz = (() => {
  $('#vol').value=volume; $('#vol').style.setProperty('--vol',volume+'%'); volIcon();
 renderRecent(); renderHistoryPage(); paintSettings();
 route(true);
+window.__opaline = { queue, preCache, prePending, audioState, settings, vp };  /* test / automation hook */
 </script>
 </body>
 </html>
